@@ -1,0 +1,54 @@
+.hover-menu {
+  position: relative;
+  overflow: hidden;
+  margin: 8px;
+  min-width: 340px;
+  max-width: 480px;
+  max-height: 290px;
+  width: 100%;
+  background: #000;
+  text-align: center;
+  box-sizing: border-box;
+}
+.hover-menu * {
+  box-sizing: border-box;
+}
+.hover-menu img {
+  position: relative;
+  max-width: 100%;
+  top: 0;
+  right: 0;
+  opacity: 1;
+  transition: 0.3s ease-in-out;
+}
+.hover-menu nav {
+  position: absolute;
+  top: 0;
+  left: -120px;
+  width: 120px;
+  height: 100%;
+  background: #000;
+  transition: 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.hover-menu nav a {
+  text-decoration: none;
+  font-size: 30pt;
+  font-family: 'Raleway', sans-serif;
+  display: block;
+  color: #fff;
+  opacity: 0.8;
+  position: relative;
+  transition: 0.3s ease-in-out;
+}
+.hover-menu:hover img {
+  opacity: 0.5;
+  right: -120px;
+}
+.hover-menu:hover nav {
+  left: 0;
+  opacity: 1;
+  pointer-events: auto;
+}
