@@ -2,7 +2,7 @@
 from google import genai
 from dotenv import load_dotenv
 from inference_sdk import InferenceHTTPClient
-from fastapi import*
+from fastapi import *
 import os
 
 load_dotenv()
@@ -12,13 +12,15 @@ roboflow_api_key = os.getenv("ROBOFLOW_API_KEY")
 
 client = genai.Client(api_key=api_key)
 
-# myfile = client.files.upload(file=media / "image.png")
-user_input = input("Enter an input:")
-
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents=user_input,
-)
+async def query_gemini(file: File):
+    
+    myfile = client.files.upload(file=file.file)
+    
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[file, "Identify if this building has disability access features. If not, suggest what could be added to help."]
+    )
+    return {"response": response}
 
 
 # 2. Connect to your workflow
