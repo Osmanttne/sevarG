@@ -22,7 +22,7 @@ async def query_gemini(file: UploadFile):
         model="gemini-2.5-flash",
         contents=[myfile, "Identify if this building has disability access features. If not, suggest what could be added to help."]
     )
-    return {"response": response}
+    return {"response": response.text}
 
 @app.post("/")
 async def gemini_endpoint(file: UploadFile = File(...)):
