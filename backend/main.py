@@ -12,15 +12,22 @@ roboflow_api_key = os.getenv("ROBOFLOW_API_KEY")
 
 client = genai.Client(api_key=api_key)
 
-async def query_gemini(file: File):
+app = FastAPI()
+
+async def query_gemini(file: UploadFile):
     
     myfile = client.files.upload(file=file.file)
     
     response = client.models.generate_content(
         model="gemini-2.5-flash",
-        contents=[file, "Identify if this building has disability access features. If not, suggest what could be added to help."]
+        contents=[myfile, "Identify if this building has disability access features. If not, suggest what could be added to help."]
     )
     return {"response": response}
+
+@app.post("/")
+async def gemini_endpoint(file: UploadFile = File(...)):
+    response = await query_gemini(file)
+    return response
 
 
 # 2. Connect to your workflow
