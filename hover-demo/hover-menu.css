@@ -1,19 +1,151 @@
-.hover-menu:hover nav a {
-  transform: translateX(90px);
+.center-hover-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  z-index: 10;
 }
-body {
+.hover-menu {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
   margin: 0;
-  background: #000;
+  width: auto;
+  text-align: center;
+  box-sizing: border-box;
+}
+.hover-menu nav {
+  position: static;
+  width: auto;
+  background: none;
+  transition: 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 11;
+  margin-top: 24px;
+}
+.hover-menu nav a {
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-family: 'Raleway', sans-serif;
+  display: block;
+  color: #fff;
+  opacity: 0.9;
+  position: relative;
+  transition: 0.3s ease-in-out;
+  margin: 18px 0;
+  background: none;
+  box-shadow: none;
+  padding: 0 0 0 0;
+  text-align: center;
+}
+
+.responsive-logo {
+  width: calc(320px * var(--logo-scale, 1));
+  max-width: calc(32vw * var(--logo-scale, 1));
+  min-width: calc(180px * var(--logo-scale, 1));
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 32px;
+  margin: calc(60px * var(--logo-scale, 1)) auto 0 auto;
+  background: none;
+  box-shadow: none;
 }
 .hover-menu {
   position: relative;
   overflow: hidden;
   margin: 0;
   width: 100vw;
-  height: 50vh;
-  background: #000;
+  background: transparent;
   text-align: center;
   box-sizing: border-box;
+}
+.hover-menu nav {
+  position: absolute;
+  top: 0;
+  left: -120px;
+  width: 120px;
+  height: 100%;
+  background: none;
+  transition: 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: none;
+  z-index: 3;
+}
+.hover-menu nav a {
+  text-decoration: none;
+  font-size: 10pt;
+  font-family: 'Raleway', sans-serif;
+  display: block;
+  color: #fff;
+  opacity: 0.8;
+  position: relative;
+  transition: 0.3s ease-in-out;
+}
+.hover-menu:hover nav {
+  left: 0;
+  opacity: 1;
+  pointer-events: auto;
+}
+.hover-menu:hover img {
+  opacity: 0.5;
+  right: -120px;
+}
+.hover-menu:hover nav a {
+  transform: translateX(90px);
+}
+body {
+  margin: 0;
+  background: #000;
+  min-height: 100vh;
+  background-image: url('images/wilsonstock.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+.hover-menu {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  width: 100vw;
+  background: transparent;
+  text-align: center;
+  box-sizing: border-box;
+}
+/* Main caption overlay at bottom */
+.main-caption {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  padding: 32px 0 24px 0;
+  text-align: center;
+  font-size: 18 px;
+  font-family: 'Raleway', sans-serif;
+  color: #fff;
+  z-index: 20;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  background: none;
+  text-shadow: 0 2px 16px #000a, 0 1px 1px #0008;
 }
 .hover-menu * {
   box-sizing: border-box;
@@ -32,23 +164,30 @@ body {
   left: -120px;
   width: 120px;
   height: 100%;
-  background: #000;
+  background: none;
   transition: 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
   justify-content: center;
   opacity: 0;
   pointer-events: none;
+  box-shadow: none;
+  z-index: 3;
 }
 .hover-menu nav a {
   text-decoration: none;
-  font-size: 30pt;
+  font-size: 20pt;
   font-family: 'Raleway', sans-serif;
   display: block;
   color: #fff;
   opacity: 0.8;
   position: relative;
   transition: 0.3s ease-in-out;
+}
+.hover-menu:hover nav {
+  left: 0;
+  opacity: 1;
+  pointer-events: auto;
 }
 .hover-menu:hover img {
   opacity: 0.5;
