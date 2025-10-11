@@ -1,11 +1,16 @@
+.hover-menu:hover nav a {
+  transform: translateX(90px);
+}
+body {
+  margin: 0;
+  background: #000;
+}
 .hover-menu {
   position: relative;
   overflow: hidden;
-  margin: 8px;
-  min-width: 340px;
-  max-width: 480px;
-  max-height: 290px;
-  width: 100%;
+  margin: 0;
+  width: 100vw;
+  height: 50vh;
   background: #000;
   text-align: center;
   box-sizing: border-box;
@@ -32,6 +37,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  opacity: 0;
+  pointer-events: none;
 }
 .hover-menu nav a {
   text-decoration: none;
