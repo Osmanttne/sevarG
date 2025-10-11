@@ -29,22 +29,27 @@ async def gemini_endpoint(file: UploadFile = File(...)):
     response = await query_gemini(file)
     return response
 
+async def query_roboflow(image: UploadFile):
+    try:
+        client = InferenceHTTPClient(
+            api_url="https://serverless.roboflow.com",
+            api_key=roboflow_api_key
+        )
 
-# 2. Connect to your workflow
-client = InferenceHTTPClient(
-    api_url="https://serverless.roboflow.com",
-    api_key=roboflow_api_key
-)
+        result = client.run_workflow(
+            workspace_name="training-data-for-independent-research",
+            workflow_id="detect-count-and-visualize",
+            images={
+                "image": image.file
+            },
+            use_cache=True
+        )
 
-# 3. Run your workflow on an image
-result = client.run_workflow(
-    workspace_name="training-data-for-independent-research",
-    workflow_id="detect-count-and-visualize",
-    images={
-        "image": "YOUR_IMAGE.jpg" # Path to your image file
-    },
-    use_cache=True # Speeds up repeated requests
-)
+        return {"response": result.json()}
+    except Exception as e:
+        return {"error": str(e)}
 
-# 4. Get your results
-print(result)
+@app.post("/")
+async def roboflow_endpoint(image: UploadFile = File(...)):
+    response = await query_roboflow(image)
+    return response
