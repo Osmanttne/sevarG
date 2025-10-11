@@ -24,7 +24,7 @@ async def query_gemini(file: UploadFile):
     )
     return {"response": response.text}
 
-@app.post("/")
+@app.post("/gemini")
 async def gemini_endpoint(file: UploadFile = File(...)):
     response = await query_gemini(file)
     return response
@@ -49,7 +49,7 @@ async def query_roboflow(image: UploadFile):
     except Exception as e:
         return {"error": str(e)}
 
-@app.post("/")
+@app.post("/roboflow")
 async def roboflow_endpoint(image: UploadFile = File(...)):
     response = await query_roboflow(image)
     return response
