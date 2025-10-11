@@ -9,9 +9,15 @@ api_key = os.getenv("API_KEY")
 
 client = genai.Client(api_key=api_key)
 
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Write a poem about the sea in 4 lines.",
-)
+# myfile = client.files.upload(file=media / "image.png")
 
-print(response.text)
+
+while (True):
+    user_input = input("Enter an input:")
+    response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=user_input,
+)
+    print(response.text)
+    if (user_input == "exit"):
+        break
