@@ -3,15 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sevarG</title>
-  <link rel="stylesheet" href="hover-menu.css" />
+  <title>sevarG Chat</title>
+
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" rel="stylesheet">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="sevarG.css">
 </head>
-<body style="background: #000; color: white; font-family: 'Raleway', sans-serif;">
-  <div style="padding: 40px; text-align: center;">
-    <h1 style="color: #4B9CD3; font-size: 48pt;">Welcome to sevarG</h1>
-    <p style="font-size: 20pt;">This is the main landing page for sevarG. Add your content here.</p>
-    <a href="index.html" style="color: #fff; font-size: 24pt; text-decoration: none; display: block; margin-top: 40px;">&larr; Back</a>
-  </div>
+
+<body>
+  <h1>sevarG</h1>
+  <p class="subtitle">Chat with Gemini about accessibility in your image</p>
+
+  <div id="chat-container"></div>
+  <div id="loading">Analyzing image... please wait ⚙️</div>
+
+  <label for="file-upload" id="upload-label">📷 Upload Image</label>
+  <input type="file" id="file-upload" accept="image/*" />
+
+  <script>
+    const fileInput = document.getElementById('file-upload');
+    const chatContainer = document.getElementById('chat-container');
+    const loading = document.getElementById('loading');
+
+    // Add a message to the chat window
+    const appendMessage = (text, sender, isHTML = false) => {
+      const msg = document.createElement('div');
+      msg.classList.add('message', sender);
+      msg.innerHTML = isHTML ? text : text.replace(/\n/g, '<br>');
+      chatContainer.appendChild(msg);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    };
+
+    // Animate Gemini's response typing
+    const typeText = async (text, sender) => {
+      const msg = document.createElement('div');
+      msg.classList.add('message', sender);
+      chatContainer.appendChild(msg);
+      for (let i = 0; i < text.length; i++) {
+        msg.innerHTML += text[i];
+        await new Promise(r => setTimeout(r, 25)); // typing speed
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    };
+
+    fileInput.addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      appendMessage(`🖼️ You uploaded: ${file.name}`, 'user');
+      loading.style.display = 'block';
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('http://localhost:8000/gemini', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        loading.style.display = 'none';
+
+        if (data.gemini?.gemini_text) {
+          await typeText(`💬 ${data.gemini.gemini_text}`, 'ai');
+        } else {
+          appendMessage('⚠️ Gemini analysis failed.', 'ai');
+        }
+
+        if (data.roboflow?.roboflow_result?.images) {
+          const annotatedUrl = data.roboflow.roboflow_result.images[0].annotated;
+          appendMessage(`<strong>Roboflow Annotated Result:</strong><br><img src="${annotatedUrl}" alt="Annotated Image">`, 'ai', true);
+        } else {
+          appendMessage('⚠️ Roboflow image not available.', 'ai');
+        }
+
+      } catch (err) {
+        loading.style.display = 'none';
+        appendMessage(`❌ Error: ${err}`, 'ai');
+      }
+    });
+  </script>
 </body>
 </html>
