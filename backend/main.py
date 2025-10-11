@@ -45,18 +45,22 @@ async def gemini_endpoint(file: UploadFile = File(...)):
     response = await query_gemini(file)
     return response
 
-async def query_roboflow(image: UploadFile):
+async def query_roboflow(file: UploadFile):
     try:
         client = InferenceHTTPClient(
             api_url="https://serverless.roboflow.com",
             api_key=roboflow_api_key
         )
 
+        with tempfile.NamedTemporaryFile(delete=False, suffix=file.filename) as temp:
+            temp.write(await file.read())
+            temp_path = temp.name
+
         result = client.run_workflow(
             workspace_name="training-data-for-independent-research",
             workflow_id="detect-count-and-visualize",
             images={
-                "image": image.file
+                "image": temp_path
             },
             use_cache=True # Speeds up repeated requests
         )
