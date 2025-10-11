@@ -1,6 +1,8 @@
 # Loading in necessary libraries for gemini and reading .env
 from google import genai
 from dotenv import load_dotenv
+from inference_sdk import InferenceHTTPClient
+from fastapi import*
 import os
 
 load_dotenv()
@@ -11,20 +13,13 @@ roboflow_api_key = os.getenv("ROBOFLOW_API_KEY")
 client = genai.Client(api_key=api_key)
 
 # myfile = client.files.upload(file=media / "image.png")
+user_input = input("Enter an input:")
 
+response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents=user_input,
+)
 
-# while (True):
-#     user_input = input("Enter an input:")
-#     response = client.models.generate_content(
-#     model="gemini-2.5-flash",
-#     contents=user_input,
-# )
-#     print(response.text)
-#     if (user_input == "exit"):
-#         break
-
-# 1. Import the library
-from inference_sdk import InferenceHTTPClient
 
 # 2. Connect to your workflow
 client = InferenceHTTPClient(
