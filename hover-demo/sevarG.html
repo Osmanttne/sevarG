@@ -48,43 +48,64 @@
       }
     };
 
-    fileInput.addEventListener('change', async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
+fileInput.addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
 
-      appendMessage(`🖼️ You uploaded: ${file.name}`, 'user');
-      loading.style.display = 'block';
+  appendMessage(`🖼️ You uploaded: ${file.name}`, 'user');
+  loading.style.display = 'block';
 
-      const formData = new FormData();
-      formData.append('file', file);
+  const formData = new FormData();
+  formData.append('file', file);
 
-      try {
-        const res = await fetch('http://localhost:8000/gemini', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await res.json();
-
-        loading.style.display = 'none';
-
-        if (data.gemini?.gemini_text) {
-          await typeText(`💬 ${data.gemini.gemini_text}`, 'ai');
-        } else {
-          appendMessage('⚠️ Gemini analysis failed.', 'ai');
-        }
-
-        if (data.roboflow?.roboflow_result?.images) {
-          const annotatedUrl = data.roboflow.roboflow_result.images[0].annotated;
-          appendMessage(`<strong>Roboflow Annotated Result:</strong><br><img src="${annotatedUrl}" alt="Annotated Image">`, 'ai', true);
-        } else {
-          appendMessage('⚠️ Roboflow image not available.', 'ai');
-        }
-
-      } catch (err) {
-        loading.style.display = 'none';
-        appendMessage(`❌ Error: ${err}`, 'ai');
-      }
+  try {
+    const res = await fetch('http://127.0.0.1:8000/gemini', {  // keep host consistent with CORS allowlist
+      method: 'POST',
+      body: formData
     });
+
+    // If server didn’t reply OK, surface the raw text
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      throw new Error(`Backend ${res.status} ${res.statusText} ${t}`);
+    }
+
+    // Ensure we actually got JSON
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) {
+      const t = await res.text();
+      throw new Error(`Expected JSON, got "${ct}". Body: ${t.slice(0, 300)}…`);
+    }
+
+    const data = await res.json();
+    loading.style.display = 'none';
+
+    // ---- display Gemini result (matches your backend) ----
+    if (typeof data.response === 'string' && data.response.trim()) {
+      await typeText(`💬 ${data.response}`, 'ai');
+    } else {
+      appendMessage('⚠️ Gemini analysis missing in response.', 'ai');
+      appendMessage(`<pre>${JSON.stringify(data, null, 2)}</pre>`, 'ai', true); // debug
+    }
+
+    // ---- optional: if you later add Roboflow to your backend, support both shapes ----
+    const annotatedUrl =
+      data?.roboflow?.roboflow_result?.images?.[0]?.annotated ||
+      data?.roboflow?.annotated_url; // alternate key if you choose
+
+    if (annotatedUrl) {
+      appendMessage(
+        `<strong>Roboflow Annotated Result:</strong><br><img src="${annotatedUrl}" alt="Annotated Image">`,
+        'ai',
+        true
+      );
+    }
+
+  } catch (err) {
+    loading.style.display = 'none';
+    appendMessage(`❌ Error: ${err.message || err}`, 'ai');
+  }
+});
   </script>
 </body>
 </html>
