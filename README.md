@@ -32,6 +32,10 @@ Python-dotenv: https://pypi.org/project/python-dotenv/
 
 Roboflow: https://roboflow.com/
 
+On Render: https://render.com/
+
+GoDaddy Registry: https://registry.godaddy/
+
 ## Demo Images
 <img width="450" height="974" alt="image" src="https://github.com/user-attachments/assets/0bcd66b9-21c3-4c18-9a26-66dacba78b9d" />
 <img width="694" height="725" alt="image" src="https://github.com/user-attachments/assets/ca89ccbd-824d-4e46-9411-0a192f7cf749" />
