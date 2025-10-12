@@ -10,18 +10,31 @@
 
 <body>
   <h1>sevarG</h1>
-  <p class="subtitle">AI-Powered Accessibility Analysis</p>
+  <div id="sevarg-layout">
+    <div id="chat-section">
+      <div id="chat-container"></div>
+      <div id="loading">Analyzing image... please wait <span class="spinner"></span></div>
 
-  <div id="chat-container"></div>
-  <div id="loading">Analyzing image... please wait <span class="spinner"></span></div>
+      <label for="file-upload" id="upload-label">Upload Image for Analysis</label>
+      <input type="file" id="file-upload" accept="image/*" />
+    </div>
 
-  <label for="file-upload" id="upload-label">Upload Image for Analysis</label>
-  <input type="file" id="file-upload" accept="image/*" />
+    <div id="image-section">
+      <img id="problem-output" alt="Problem Identification" style="display: none;" />
+      <img id="solution-output" alt="Accessibility Solution" style="display: none;" />
+      <div id="shopping-list-container" style="display: none;"></div>
+      <p id="no-image-msg">Problem identification, solution visualization, and shopping list will appear here</p>
+    </div>
+  </div>
 
   <script>
     const fileInput = document.getElementById('file-upload');
     const chatContainer = document.getElementById('chat-container');
     const loading = document.getElementById('loading');
+    const problemImg = document.getElementById('problem-output');
+    const solutionImg = document.getElementById('solution-output');
+    const shoppingListContainer = document.getElementById('shopping-list-container');
+    const noImageMsg = document.getElementById('no-image-msg');
 
     const appendMessage = (text, sender, isHTML = false) => {
       const msg = document.createElement('div');
@@ -32,91 +45,94 @@
     };
 
     const formatGeminiResponse = (text) => {
-      let html = '<h3> Accessibility Analysis</h3>';
-      
-      // Detect status and add badge
+      let html = '<h3>Accessibility Analysis</h3>';
       const lowerText = text.toLowerCase();
       if (lowerText.includes('fully accessible') || lowerText.includes('good accessibility')) {
-        html += '<span class="status-badge status-accessible">✓ Accessible</span>';
+        html += '<span class="status-badge status-accessible">Accessible</span>';
       } else if (lowerText.includes('limited accessibility') || lowerText.includes('some features')) {
-        html += '<span class="status-badge status-needs-improvement">⚠ Needs Improvement</span>';
+        html += '<span class="status-badge status-needs-improvement">Needs Improvement</span>';
       } else if (lowerText.includes('no') || lowerText.includes('not accessible')) {
-        html += '<span class="status-badge status-inaccessible">✗ Inaccessible</span>';
+        html += '<span class="status-badge status-inaccessible">Inaccessible</span>';
       }
 
-      // Split into sections
-      const sections = text.split(/\n\n+/);
+      text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
       
+      const sections = text.split(/\n\n+/);
       sections.forEach(section => {
         section = section.trim();
         if (!section) return;
 
-        // Check if it's a heading (usually starts with ** or is all caps)
-        if (section.startsWith('**') || section === section.toUpperCase()) {
-          const heading = section.replace(/\*\*/g, '').trim();
+        if (section.startsWith('##')) {
+          const heading = section.replace(/^##\s*/, '');
           html += `<h4>${heading}</h4>`;
-        }
-        // Check if it's a list
-        else if (section.includes('\n* ') || section.includes('\n- ')) {
-          const items = section.split('\n').filter(s => s.trim());
-          html += '<ul>';
-          items.forEach(item => {
-            const cleaned = item.replace(/^[*-]\s*/, '').trim();
-            if (cleaned) {
-              html += `<li>${cleaned}</li>`;
-            }
+        } else if (section.includes('\n* ') || section.includes('\n- ') || section.includes('\n- **')) {
+          const items = section.split('\n').filter(s => s.trim()).map(item => {
+            let cleanItem = item.replace(/^[-*]\s*/, '').trim();
+            return `<li>${cleanItem}</li>`;
           });
-          html += '</ul>';
-        }
-        // Check if it's a numbered list (1. 2. 3. format)
-        else if (/^\d+\.\s/.test(section) || section.split('\n').some(line => /^\d+\.\s/.test(line.trim()))) {
-          const items = section.split(/(?=\d+\.\s)/);
-          html += '<ol>';
-          items.forEach(item => {
-            let cleaned = item.replace(/^\d+\.\s*/, '').trim();
-            // Process bold/italic in list items
-            cleaned = cleaned
-              .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-              .replace(/\*([^*]+)\*/g, '<em>$1</em>');
-            if (cleaned) {
-              html += `<li>${cleaned}</li>`;
-            }
+          html += '<ul>' + items.join('') + '</ul>';
+        } else if (/^\d+\.\s/.test(section)) {
+          const items = section.split(/(?=\d+\.\s)/).map(item => {
+            let cleanItem = item.replace(/^\d+\.\s*/, '').trim();
+            return `<li>${cleanItem}</li>`;
           });
-          html += '</ol>';
-        }
-        // Regular paragraph
-        else {
-          // Bold key terms
-          let formatted = section
-            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*([^*]+)\*/g, '<em>$1</em>');
-          html += `<p>${formatted}</p>`;
+          html += '<ol>' + items.join('') + '</ol>';
+        } else {
+          html += `<p>${section}</p>`;
         }
       });
-
       return html;
+    };
+
+    const displayShoppingList = (shoppingList) => {
+      if (!shoppingList || shoppingList.length === 0) {
+        return;
+      }
+
+      shoppingListContainer.innerHTML = `
+        <div class="shopping-list-header">
+          <h3>Lowe's Shopping List</h3>
+          <p class="shopping-subtitle">Products to improve accessibility</p>
+        </div>
+        <div class="shopping-items">
+          ${shoppingList.map(item => `
+            <div class="shopping-item">
+              <div class="item-header">
+                <h4 class="item-name">${item.product_name}</h4>
+                <span class="item-price">${item.price_range}</span>
+              </div>
+              <div class="item-category">${item.category}</div>
+              <p class="item-description">${item.description}</p>
+              <a href="${item.url}" target="_blank" class="item-link">
+                View at Lowe's
+              </a>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      shoppingListContainer.style.display = 'block';
     };
 
     const typeFormattedText = async (html, sender) => {
       const msg = document.createElement('div');
       msg.classList.add('message', sender);
       chatContainer.appendChild(msg);
-      
-      // For formatted content, show it all at once with a nice fade
       msg.style.opacity = '0';
       msg.innerHTML = html;
-      
-      // Fade in animation
       await new Promise(r => setTimeout(r, 100));
       msg.style.transition = 'opacity 0.5s ease';
       msg.style.opacity = '1';
-      
       chatContainer.scrollTop = chatContainer.scrollHeight;
     };
 
     fileInput.addEventListener('change', async (event) => {
       const file = event.target.files[0];
       if (!file) return;
+
+      problemImg.style.display = 'none';
+      solutionImg.style.display = 'none';
+      shoppingListContainer.style.display = 'none';
+      noImageMsg.style.display = 'block';
 
       appendMessage(`Uploaded: ${file.name}`, 'user');
       loading.style.display = 'block';
@@ -130,45 +146,39 @@
           body: formData
         });
 
-        if (!res.ok) {
-          const t = await res.text().catch(() => '');
-          throw new Error(`Backend ${res.status} ${res.statusText} ${t}`);
-        }
-
-        const ct = res.headers.get('content-type') || '';
-        if (!ct.includes('application/json')) {
-          const t = await res.text();
-          throw new Error(`Expected JSON, got "${ct}". Body: ${t.slice(0, 300)}…`);
-        }
-
         const data = await res.json();
+        console.log('Full response:', data);
+        
         loading.style.display = 'none';
 
-        if (typeof data.response === 'string' && data.response.trim()) {
+        if (data.response) {
           const formattedHTML = formatGeminiResponse(data.response);
           await typeFormattedText(formattedHTML, 'ai');
-        } else {
-          appendMessage('⚠️ Gemini analysis missing in response.', 'ai');
         }
 
-        // Handle Roboflow if present
-        const annotatedUrl =
-          data?.roboflow?.roboflow_result?.images?.[0]?.annotated ||
-          data?.roboflow?.annotated_url;
+        if (data.problem_image) {
+          console.log('Displaying problem identification image');
+          problemImg.src = data.problem_image;
+          problemImg.style.display = 'block';
+          noImageMsg.style.display = 'none';
+        }
 
-        if (annotatedUrl) {
-          appendMessage(
-            `<h3>🎯 Object Detection Results</h3><img src="${annotatedUrl}" alt="Annotated Image">`,
-            'ai',
-            true
-          );
+        if (data.shopping_list && data.shopping_list.length > 0) {
+          console.log('Displaying shopping list');
+          displayShoppingList(data.shopping_list);
         }
 
       } catch (err) {
         loading.style.display = 'none';
-        appendMessage(`❌ Error: ${err.message || err}`, 'ai');
+        console.error('Error:', err);
+        appendMessage(`Error: ${err.message}`, 'ai');
       }
     });
   </script>
 </body>
+            </div>
+            
+            <a href="index.html" style="color: #fff; font-size: 24pt; text-decoration: none; display: block; margin-top: 60px;">&larr; Back</a>
+        </div>
+
 </html>

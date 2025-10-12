@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Computer Vision Implementation - sevarG</title>
+  <link rel="stylesheet" href="future.css" />
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="header">
+    <h1>Computer Vision Implementation</h1>
+    <p class="subtitle">Training Neural Networks for Accessibility Detection</p>
+    <a href="index.html" class="back-link">← Back to Home</a>
+  </div>
+
+  <div class="container">
+    <section class="section">
+      <h2 class="section-title">Training Data</h2>
+      <p class="section-description">
+        Our computer vision model is trained on diverse architectural accessibility features. These training images represent the three key categories our system learns to identify: sidewalks, ramps, and elevators. Each category helps the model understand different aspects of accessible building design.
+      </p>
+      
+      <div class="training-grid">
+        <div class="training-item">
+          <h3>Sidewalk Detection</h3>
+          <div class="image-container">
+            <img src="images-future/pavement.jpg" alt="Training data - Sidewalk" />
+          </div>
+          <p class="training-description">
+            Training images of sidewalks help our model identify pedestrian pathways, curb cuts, and ground-level accessibility features. The model learns to recognize width, surface texture, and obstacle-free paths.
+          </p>
+        </div>
+
+        <div class="training-item">
+          <h3>Ramp Recognition</h3>
+          <div class="image-container">
+            <img src="images-future/ramp.jpg" alt="Training data - Ramp" />
+          </div>
+          <p class="training-description">
+            Ramp training data teaches the model to identify inclined surfaces, handrails, and proper gradients. This enables detection of wheelchair-accessible entrances and transitions between elevation levels.
+          </p>
+        </div>
+
+        <div class="training-item">
+          <h3>Elevator Identification</h3>
+          <div class="image-container">
+            <img src="images-future/elevator.jpg" alt="Training data - Elevator" />
+          </div>
+          <p class="training-description">
+            Elevator training images help the model recognize vertical accessibility solutions. The system learns to identify elevator doors, control panels, and entrance configurations for multi-story accessibility.
+          </p>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <h2 class="section-title">Workflow</h2>
+      <div class="implementation-content">
+        <div class="workflow-image-container">
+          <img src="images-future/workflow.png" alt="Workflow diagram" />
+        </div>
+        <h3>Vision for Automated Accessibility Analysis</h3>
+        <p>
+          Our future implementation aims to create a fully automated system that can analyze architectural images and provide instant accessibility assessments. This computer vision approach will revolutionize how we evaluate buildings for accessibility compliance.
+        </p>
+
+        <h3>Planned Features</h3>
+        <ul>
+          <li><strong>Real-time Detection:</strong> Instant identification of accessibility features from photos or video streams</li>
+          <li><strong>Compliance Scoring:</strong> Automated evaluation against ADA and accessibility standards</li>
+          <li><strong>Mobile Integration:</strong> Smartphone app allowing users to scan buildings and receive immediate feedback</li>
+          <li><strong>Database Building:</strong> Crowdsourced collection of accessibility data across locations</li>
+          <li><strong>Predictive Analysis:</strong> AI suggestions for accessibility improvements based on detected features</li>
+        </ul>
+
+        <h3>Technical Approach</h3>
+        <p>
+          We're developing a convolutional neural network (CNN) trained on thousands of architectural images. The model uses transfer learning from established computer vision architectures, fine-tuned specifically for accessibility features. Our approach includes:
+        </p>
+        <ul>
+          <li>Multi-class object detection for identifying ramps, elevators, and pathways</li>
+          <li>Semantic segmentation to understand spatial relationships</li>
+          <li>Measurement estimation for gradient angles and pathway widths</li>
+          <li>Integration with existing accessibility databases</li>
+        </ul>
+
+        <h3>Impact and Timeline</h3>
+        <p>
+          This implementation will enable architects, building managers, and accessibility advocates to quickly assess structures. We aim to deploy a beta version within the next year, with continuous improvements based on user feedback and expanding training data.
+        </p>
+      </div>
+    </section>
+    <section class="section">
+      <h2 class="section-title">Results of Annotation</h2>
+      <p class="section-description">
+        Our annotated images demonstrate the model's capability to identify and classify accessibility features in real-world scenarios. These results show bounding boxes and labels automatically generated by our computer vision system.
+      </p>
+      
+      <div class="results-grid">
+        <div class="result-item">
+          <h3>Annotated Result 1</h3>
+          <div class="result-image-container">
+            <img src="images-future/annotation_!.png" alt="Annotated detection result 1" />
+          </div>
+          <p class="result-description">
+            This annotated image shows our model successfully detecting multiple accessibility features with confidence scores and classification labels. The bounding boxes indicate detected regions with their respective categories.
+          </p>
+        </div>
+
+        <div class="result-item">
+          <h3>Annotated Result 2</h3>
+          <div class="result-image-container">
+            <img src="images-future/annotation_2.png" alt="Annotated detection result 2" />
+          </div>
+          <p class="result-description">
+            The second annotated result demonstrates the model's ability to handle complex architectural scenes with multiple features. The system accurately identifies and labels accessibility elements in varied lighting and angle conditions.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+            </div>
+            
+            <a href="index.html" style="color: #fff; font-size: 24pt; text-decoration: none; display: block; margin-top: 60px;">&larr; Back</a>
+        </div>
+</html>
