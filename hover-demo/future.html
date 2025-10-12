@@ -10,7 +10,7 @@
 <body>
   <div class="header">
     <h1>Computer Vision Implementation</h1>
-    <p class="subtitle">Training Neural Networks for Accessibility Detection</p>
+    <p class="subtitle">Training Neural Networks for Accessibility Detection through Roboflow</p>
     <a href="index.html" class="back-link">← Back to Home</a>
   </div>
 
@@ -61,32 +61,20 @@
         </div>
         <h3>Vision for Automated Accessibility Analysis</h3>
         <p>
-          Our future implementation aims to create a fully automated system that can analyze architectural images and provide instant accessibility assessments. This computer vision approach will revolutionize how we evaluate buildings for accessibility compliance.
+          We as a group developed our own unique set of training data for training image processing models to identify and classify architectural accessibility features. Our goal is to create a system that can automatically analyze images of buildings and infrastructure to assess their accessibility compliance.
         </p>
 
-        <h3>Planned Features</h3>
+        <h3>Features</h3>
         <ul>
-          <li><strong>Real-time Detection:</strong> Instant identification of accessibility features from photos or video streams</li>
-          <li><strong>Compliance Scoring:</strong> Automated evaluation against ADA and accessibility standards</li>
-          <li><strong>Mobile Integration:</strong> Smartphone app allowing users to scan buildings and receive immediate feedback</li>
-          <li><strong>Database Building:</strong> Crowdsourced collection of accessibility data across locations</li>
-          <li><strong>Predictive Analysis:</strong> AI suggestions for accessibility improvements based on detected features</li>
+          <li><strong>Training data</strong> Large arrays of images carrying different visual attributes of disabled accessibility freindly architecture </li>
+          <li><strong>Strong Annotation</strong> Many Annotations made on training data and many objects defined to optimize the object detection process as best as possible</li>
+          <li><strong>Augmentation</strong> Training data images are optimized for best algorithmic performance, this includes opperations such as image augmentations</li>
+          <li><strong>Yolov8</strong> Bounding box analysis and labeling through neural network models such as yolov8</li>
+          <li><strong>Predictive Strength:</strong> Results are gathered and classified by confidence thresholds indicating if the algorithm had performed detections to a high degree of confidence</li>
         </ul>
-
-        <h3>Technical Approach</h3>
-        <p>
-          We're developing a convolutional neural network (CNN) trained on thousands of architectural images. The model uses transfer learning from established computer vision architectures, fine-tuned specifically for accessibility features. Our approach includes:
-        </p>
-        <ul>
-          <li>Multi-class object detection for identifying ramps, elevators, and pathways</li>
-          <li>Semantic segmentation to understand spatial relationships</li>
-          <li>Measurement estimation for gradient angles and pathway widths</li>
-          <li>Integration with existing accessibility databases</li>
-        </ul>
-
         <h3>Impact and Timeline</h3>
         <p>
-          This implementation will enable architects, building managers, and accessibility advocates to quickly assess structures. We aim to deploy a beta version within the next year, with continuous improvements based on user feedback and expanding training data.
+          Although we have made our training data and trained the Roboflow Yolov8 model with high levels of confidence in analysis, implementing this feature into sevarG is part of our plans for the future. This implementation will enable architects, building managers, and accessibility advocates to quickly assess structures.
         </p>
       </div>
     </section>
