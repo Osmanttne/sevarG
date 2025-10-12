@@ -3,7 +3,7 @@
   <img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/14711087-0828-47ee-8c1d-64817750c58a" />
 </p>
 
-## sevarG.design
+## [sevarG.design](https://sevarg.design/)
 A web platform designed to provide structural improvement suggestions for architecture to strive toward accessibility for the disabled.
 SevarG is inspired by Michael Graves, a disabled architect and designer whose work redefined accessibility and beauty in everyday life. His legacy reminds us that great design should empower everyone, regardless of ability.
 SevarG is more than just a website that offers consulting to architects; it is also a strong example of modern technologies in community service and benefit. SevarG contains technologies such as AI Api integration and image processing models through Roboflow and Yolo.
