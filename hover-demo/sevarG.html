@@ -4,22 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>sevarG Chat</title>
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" rel="stylesheet">
-
-  <!-- External CSS -->
   <link rel="stylesheet" href="sevarG.css">
 </head>
 
 <body>
   <h1>sevarG</h1>
-  <p class="subtitle">Chat with Gemini about accessibility in your image</p>
+  <p class="subtitle">AI-Powered Accessibility Analysis</p>
 
   <div id="chat-container"></div>
-  <div id="loading">Analyzing image... please wait ⚙️</div>
+  <div id="loading">Analyzing image... please wait <span class="spinner"></span></div>
 
-  <label for="file-upload" id="upload-label">📷 Upload Image</label>
+  <label for="file-upload" id="upload-label">Upload Image for Analysis</label>
   <input type="file" id="file-upload" accept="image/*" />
 
   <script>
@@ -27,7 +23,6 @@
     const chatContainer = document.getElementById('chat-container');
     const loading = document.getElementById('loading');
 
-    // Add a message to the chat window
     const appendMessage = (text, sender, isHTML = false) => {
       const msg = document.createElement('div');
       msg.classList.add('message', sender);
@@ -36,76 +31,144 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     };
 
-    // Animate Gemini's response typing
-    const typeText = async (text, sender) => {
+    const formatGeminiResponse = (text) => {
+      let html = '<h3> Accessibility Analysis</h3>';
+      
+      // Detect status and add badge
+      const lowerText = text.toLowerCase();
+      if (lowerText.includes('fully accessible') || lowerText.includes('good accessibility')) {
+        html += '<span class="status-badge status-accessible">✓ Accessible</span>';
+      } else if (lowerText.includes('limited accessibility') || lowerText.includes('some features')) {
+        html += '<span class="status-badge status-needs-improvement">⚠ Needs Improvement</span>';
+      } else if (lowerText.includes('no') || lowerText.includes('not accessible')) {
+        html += '<span class="status-badge status-inaccessible">✗ Inaccessible</span>';
+      }
+
+      // Split into sections
+      const sections = text.split(/\n\n+/);
+      
+      sections.forEach(section => {
+        section = section.trim();
+        if (!section) return;
+
+        // Check if it's a heading (usually starts with ** or is all caps)
+        if (section.startsWith('**') || section === section.toUpperCase()) {
+          const heading = section.replace(/\*\*/g, '').trim();
+          html += `<h4>${heading}</h4>`;
+        }
+        // Check if it's a list
+        else if (section.includes('\n* ') || section.includes('\n- ')) {
+          const items = section.split('\n').filter(s => s.trim());
+          html += '<ul>';
+          items.forEach(item => {
+            const cleaned = item.replace(/^[*-]\s*/, '').trim();
+            if (cleaned) {
+              html += `<li>${cleaned}</li>`;
+            }
+          });
+          html += '</ul>';
+        }
+        // Check if it's a numbered list (1. 2. 3. format)
+        else if (/^\d+\.\s/.test(section) || section.split('\n').some(line => /^\d+\.\s/.test(line.trim()))) {
+          const items = section.split(/(?=\d+\.\s)/);
+          html += '<ol>';
+          items.forEach(item => {
+            let cleaned = item.replace(/^\d+\.\s*/, '').trim();
+            // Process bold/italic in list items
+            cleaned = cleaned
+              .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+              .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            if (cleaned) {
+              html += `<li>${cleaned}</li>`;
+            }
+          });
+          html += '</ol>';
+        }
+        // Regular paragraph
+        else {
+          // Bold key terms
+          let formatted = section
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+          html += `<p>${formatted}</p>`;
+        }
+      });
+
+      return html;
+    };
+
+    const typeFormattedText = async (html, sender) => {
       const msg = document.createElement('div');
       msg.classList.add('message', sender);
       chatContainer.appendChild(msg);
-      for (let i = 0; i < text.length; i++) {
-        msg.innerHTML += text[i];
-        await new Promise(r => setTimeout(r, 25)); // typing speed
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
+      
+      // For formatted content, show it all at once with a nice fade
+      msg.style.opacity = '0';
+      msg.innerHTML = html;
+      
+      // Fade in animation
+      await new Promise(r => setTimeout(r, 100));
+      msg.style.transition = 'opacity 0.5s ease';
+      msg.style.opacity = '1';
+      
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     };
 
-fileInput.addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+    fileInput.addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
 
-  appendMessage(`🖼️ You uploaded: ${file.name}`, 'user');
-  loading.style.display = 'block';
+      appendMessage(`Uploaded: ${file.name}`, 'user');
+      loading.style.display = 'block';
 
-  const formData = new FormData();
-  formData.append('file', file);
+      const formData = new FormData();
+      formData.append('file', file);
 
-  try {
-    const res = await fetch('http://127.0.0.1:8000/gemini', {  // keep host consistent with CORS allowlist
-      method: 'POST',
-      body: formData
+      try {
+        const res = await fetch('http://127.0.0.1:8000/gemini', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          const t = await res.text().catch(() => '');
+          throw new Error(`Backend ${res.status} ${res.statusText} ${t}`);
+        }
+
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+          const t = await res.text();
+          throw new Error(`Expected JSON, got "${ct}". Body: ${t.slice(0, 300)}…`);
+        }
+
+        const data = await res.json();
+        loading.style.display = 'none';
+
+        if (typeof data.response === 'string' && data.response.trim()) {
+          const formattedHTML = formatGeminiResponse(data.response);
+          await typeFormattedText(formattedHTML, 'ai');
+        } else {
+          appendMessage('⚠️ Gemini analysis missing in response.', 'ai');
+        }
+
+        // Handle Roboflow if present
+        const annotatedUrl =
+          data?.roboflow?.roboflow_result?.images?.[0]?.annotated ||
+          data?.roboflow?.annotated_url;
+
+        if (annotatedUrl) {
+          appendMessage(
+            `<h3>🎯 Object Detection Results</h3><img src="${annotatedUrl}" alt="Annotated Image">`,
+            'ai',
+            true
+          );
+        }
+
+      } catch (err) {
+        loading.style.display = 'none';
+        appendMessage(`❌ Error: ${err.message || err}`, 'ai');
+      }
     });
-
-    // If server didn’t reply OK, surface the raw text
-    if (!res.ok) {
-      const t = await res.text().catch(() => '');
-      throw new Error(`Backend ${res.status} ${res.statusText} ${t}`);
-    }
-
-    // Ensure we actually got JSON
-    const ct = res.headers.get('content-type') || '';
-    if (!ct.includes('application/json')) {
-      const t = await res.text();
-      throw new Error(`Expected JSON, got "${ct}". Body: ${t.slice(0, 300)}…`);
-    }
-
-    const data = await res.json();
-    loading.style.display = 'none';
-
-    // ---- display Gemini result (matches your backend) ----
-    if (typeof data.response === 'string' && data.response.trim()) {
-      await typeText(`💬 ${data.response}`, 'ai');
-    } else {
-      appendMessage('⚠️ Gemini analysis missing in response.', 'ai');
-      appendMessage(`<pre>${JSON.stringify(data, null, 2)}</pre>`, 'ai', true); // debug
-    }
-
-    // ---- optional: if you later add Roboflow to your backend, support both shapes ----
-    const annotatedUrl =
-      data?.roboflow?.roboflow_result?.images?.[0]?.annotated ||
-      data?.roboflow?.annotated_url; // alternate key if you choose
-
-    if (annotatedUrl) {
-      appendMessage(
-        `<strong>Roboflow Annotated Result:</strong><br><img src="${annotatedUrl}" alt="Annotated Image">`,
-        'ai',
-        true
-      );
-    }
-
-  } catch (err) {
-    loading.style.display = 'none';
-    appendMessage(`❌ Error: ${err.message || err}`, 'ai');
-  }
-});
   </script>
 </body>
 </html>
